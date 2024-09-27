@@ -1,81 +1,125 @@
 import random
 import time
 
-#list of hints
+#Checks to see if the number to guess is prime (hint)
+def is_prime(num):
+    for i in range(2, int(num**0.5) + 1):
+        if num % i == 0:
+            return False
+    return True
+
+def get_prime_hint(number_to_guess):
+    if is_prime(number_to_guess):
+        return f"Hint: it's a prime number."
+    else:
+        return f"Hint: it's not a prime number."
+
+#Converts to binary (hint)   
+def binary(number_to_guess):
+    return f"Hint: The number is {bin(number_to_guess)[2:]}"
+
+#Checks the difference between last guess and correct answer (hint)
+def diff_hint(number_to_guess, last_guess):
+    if last_guess is None:
+        return None
+    else:
+        difference = abs(number_to_guess - last_guess)
+        return f"Hint: The difference between your last guess and the correct number is {difference}."
 
 #List of hints
-hints_list = [
-     "haven't filled this one out yet"
-]
+def get_hint(number_to_guess, last_guess):
+      
+    hints_list = [
+        "Hint: it's an even number." if random.randint(1,2) == 1 else "Hint: it's an odd mumber.",
+        lambda number_to_guess: get_prime_hint(number_to_guess),
+        lambda number_to_guess: binary(number_to_guess),
+        lambda number_to_guess: diff_hint(number_to_guess, last_guess) if last_guess is not None else None,
+        "Hint: it's a lucky mumber!" if number_to_guess == 7 else
+        "Hint: it's an unlucky number!" if number_to_guess == 4 else
+        "Hint: it's associated with a certain rapper!" if number_to_guess == 21 else 
+        "Hint: it's associated with a certain rapper!" if number_to_guess == 50 else
+        "Hint: it's the answer to life, the universe, and everything!" if number_to_guess == 42  else 
+        "Guess the number in the middle of the range!"
+    ]
 
-#List of hardships
-hardship_list = [
-     "Not done"
-]
-#grabs random hints
-def get_hint()
-     hint = random.choice(hints_list)
-
-#grabs random hardships
-def hardship()
-     shinzo = random.choice(hardship_list))
+    #grabs random hints
+    while True:
+            hint = random.choice(hints_list)
+            if callable(hint):  # If the hint is a lambda function, call it
+                hint = hint(number_to_guess)
+            if hint is not None:
+                return hint
 
 #main function for game loop
 def game():
-    print("Hello! This is a number guessing game.\n You have 30s to guess the number in the range given to you.\n　Once you guess the right answer, an additional 10s is added to your time and you have to guess a new number from the wider range.\nSounds easy, simple, and fun right?\n You have three chances to guess the right answer. \n 行きましょう！")
+    print("Hello! This is a number guessing game.\n" 
+          "You have 30s to guess the number in the range given to you.\n"
+          "Once you guess the right answer, an additional 10s is added to your time and you have to guess a new number from the wider range.\n"
+          "Sounds easy, simple, and fun right?\n" 
+          "You have three chances to guess the right answer. \n" 
+          "Good luck!")
 
     lower_bound = 1
     upper_bound = 10
-    time_limit = 30
-    chances = 3
+    base_time_limit = 30
+    time_limit = base_time_limit
+    chances = 4
+    correct_counter = 0 #counts how many correct guesses they've had
+    last_guess = None
 
     #This starts the main game loop
-    number_to_guess = random.randint(lower_bound, upper_bound)
+    while True:
+        number_to_guess = random.randint(lower_bound+1, upper_bound-1)
         print(f"Guess a number between {lower_bound} and {upper_bound}.")
-        
+            
         start_time = time.time()
         attempts = 0
+        last_guess = None
         
         while attempts < chances:
-            try:
-                user_guess = int(input(f"You have {time_limit} seconds to guess: "))
-            except ValueError:
-                print("Invalid input. Please enter an integer.")
-                continue
-
-        if user_guess == number_to_guess:
-                print("Congratulations! You guessed the number!")
-                lower_bound += 10
-                upper_bound += 10
-                time_limit += 10
-                break  # Exit the inner loop and start a new round
-            else:
-                print(f"Wrong guess. You have {chances - attempts - 1} attempts left.")
-                attempts += 1
-            
             elapsed_time = time.time() - start_time
+            remaining_time = max(0, time_limit - elapsed_time)
             if elapsed_time > time_limit:
-                print(f"Time's up! The number was {number_to_guess}.")
-                lower_bound = 1
-                upper_bound = 10
-                time_limit = 30
-                break  # Exit the inner loop and start a new round
-        
-        if attempts == chances:
-            print(f"Game over! The number was {number_to_guess}.")
-            lower_bound = 1
-            upper_bound = 10
-            time_limit = 30
+                    print(f"Time's up! The number was {number_to_guess}.")
+                    lower_bound = 1
+                    upper_bound = 10
+                    time_limit = base_time_limit
+                    break  # Exit the inner loop and start a new round
+           
+            user_guess = int(input(f"You have {remaining_time:.0f} seconds to guess: "))
 
-        while attempts < chances:
-            hint = input("Would you like a hint? It will take 10 seconds off your timer.(y/n) ")
-                if hint = 'y':
-                    time_limit -= 10
-                    hint = get_hint()
-                    print(hint)
-            shinzo = input("If you increase the difficulty, I'll give you an extra life. What do you say? (y/n): ")    
-                if shinzo = 'y':
-                    chances += 1
-                    hardship = (hardship_list)
-                    print(hardship)
-        
+            if user_guess == number_to_guess:
+                            print("Congratulations! You guessed the number!")
+                            upper_bound += 10
+                            last_guess = None
+                            correct_counter += 1
+                            time_limit = remaining_time + 10
+                            if correct_counter == 3:
+                                print("You've guessed the number three times! Your lives have been restored and the timer has been reset!")
+                                attempts = 0
+                                correct_counter = 0
+                                time_limit = base_time_limit
+                            break
+          
+            elif user_guess < number_to_guess:
+                            print(f"Too low! You have {chances - attempts - 1} attempts left.")
+                            attempts += 1
+                            last_guess = user_guess
+
+            elif user_guess > number_to_guess:
+                            print(f"Too high! You have {chances - attempts - 1} attempts left.")
+                            attempts += 1
+                            last_guess = user_guess
+
+            else:
+                print("Please enter an integer.")
+                    
+        if attempts == chances:
+                        print(f"Game over! The number was {number_to_guess}.")
+                        lower_bound = 1
+                        upper_bound = 10
+                        time_limit = base_time_limit
+
+         
+if __name__ == "__main__":
+    game()
