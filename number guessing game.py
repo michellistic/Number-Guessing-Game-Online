@@ -76,6 +76,7 @@ def game():
         attempts = 0
         last_guess = None
         
+        
         while attempts < chances:
             elapsed_time = time.time() - start_time
             remaining_time = max(0, time_limit - elapsed_time)
@@ -85,41 +86,43 @@ def game():
                     upper_bound = 10
                     time_limit = base_time_limit
                     break  # Exit the inner loop and start a new round
-           
-            user_guess = int(input(f"You have {remaining_time:.0f} seconds to guess: "))
+            
+            user_input = input(f"You have {remaining_time:.0f} seconds to guess: ") 
 
+            try:             
+                   user_guess = int(user_input)
+            except ValueError:
+                    print("Invalid input....enter an integer.")
+                    break
+            
             if user_guess == number_to_guess:
-                            print("Congratulations! You guessed the number!")
-                            upper_bound += 10
-                            last_guess = None
-                            correct_counter += 1
-                            time_limit = remaining_time + 10
-                            if correct_counter == 3:
-                                print("You've guessed the number three times! Your lives have been restored and the timer has been reset!")
-                                attempts = 0
-                                correct_counter = 0
-                                time_limit = base_time_limit
-                            break
-          
+                                print("Congratulations! You guessed the number!")
+                                upper_bound += 10
+                                last_guess = None
+                                correct_counter += 1
+                                time_limit = remaining_time + 10
+                                if correct_counter == 3:
+                                    print("You've guessed the number three times! Your lives have been restored and the timer has been reset!")
+                                    attempts = 0
+                                    correct_counter = 0
+                                    time_limit = base_time_limit
+                                break
+            
             elif user_guess < number_to_guess:
-                            print(f"Too low! You have {chances - attempts - 1} attempts left.")
-                            attempts += 1
-                            last_guess = user_guess
+                                print(f"Too low! You have {chances - attempts - 1} attempts left.")
+                                attempts += 1
+                                last_guess = user_guess
 
             elif user_guess > number_to_guess:
-                            print(f"Too high! You have {chances - attempts - 1} attempts left.")
-                            attempts += 1
-                            last_guess = user_guess
-
-            else:
-                print("Please enter an integer.")
-                    
-        if attempts == chances:
-                        print(f"Game over! The number was {number_to_guess}.")
-                        lower_bound = 1
-                        upper_bound = 10
-                        time_limit = base_time_limit
-
+                                print(f"Too high! You have {chances - attempts - 1} attempts left.")
+                                attempts += 1
+                                last_guess = user_guess
+                        
+            if attempts == chances:
+                            print(f"Game over! The number was {number_to_guess}.")
+                            lower_bound = 1
+                            upper_bound = 10
+                            time_limit = base_time_limit
          
 if __name__ == "__main__":
     game()
