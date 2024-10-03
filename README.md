@@ -9,3 +9,5 @@ If you guess correctly before time goes up you get 10s added to your timer and t
 
 
 If you guess correctly three times the timer is reset.
+
+Note: there is some code in this that references hints, I plan to add that feature to this game on a later date.
